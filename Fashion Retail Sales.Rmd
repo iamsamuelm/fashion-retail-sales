@@ -1,0 +1,32 @@
+---
+title: "Fashion Retail Sales"
+author: "Samuel Muma, Aaliyah Bahru, Akshaya Gajula, Betanya Woldgiogis, Shihao Lu"
+date: "2025-04-18"
+output: html_document
+---
+
+# Fashion Retail Sales Dataset
+
+This data set contains 3,400 records of fashion retail sales, capturing various details about customer purchases, including item details, purchase amounts, ratings, and payment methods. It is useful for analyzing customer buying behavior, product popularity, and payment preferences.
+
+```{r}
+# Check if required packages are not already installed 
+required_packages <- c("readr", "dplyr", "tidyr", "ggplot2", "viridis") #I'll add more here if needed
+
+new_packages <- required_packages[!required_packages %in% installed.packages()]
+if (length(new_packages) > 0) {
+  install.packages(new_packages)
+}
+
+# Load required libraries
+library(readr)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(viridis)
+
+# Read in CSV
+fashion_df <- read_csv("Fashion_Retail_Sales.csv")
+head(fashion_df)
+```
+

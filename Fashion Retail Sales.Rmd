@@ -28,5 +28,91 @@ library(viridis)
 # Read in CSV
 fashion_df <- read_csv("Fashion_Retail_Sales.csv")
 head(fashion_df)
+
+# add 0 to null value
+fashion_df$`Purchase Amount (USD)`[is.na(fashion_df$`Purchase Amount (USD)`)] <- 0
+
+
+head(fashion_df)
+
+fashion_df$`Date Purchase` <- as.Date(fashion_df$`Date Purchase`, format = "%d-%m-%Y")
+
+summary(fashion_df)
 ```
 
+
+  
+# Univariate Plots
+  
+ggplot(fashion_df, aes(x=`Purchase Amount (USD)`, y=0)) + 
+geom_dotplot(binaxis="x", dotsize=0.6, fill="blue") +
+labs(title = "Purchase Amount count")
+  
+  
+
+ggplot(fashion_df, aes(x = `Payment Method`)) +
+  geom_bar(fill = "red") +
+  labs(title = "Payment Method Count")
+  
+ggplot(fashion_df, aes(x = `Review Rating`)) +
+geom_histogram(binwidth = 0.5, fill = "pink", color = "black") 
+
+
+
+ggplot(fashion_df, aes(x = `Date Purchase`)) +
+  geom_bar(fill = "black") +
+  labs(title = "Date Purchase count")
+
+
+
+#Bivariate Plots
+
+
+
+
+ggplot(fashion_df, aes(x = `Review Rating`, fill = `Payment Method`)) +
+  geom_histogram(binwidth = 0.5, position = "dodge", color = "black", na.rm = TRUE) +
+  labs(title = "Review Ratings by Payment Method")
+
+fashion_df %>%
+  group_by(`Date Purchase`) %>%
+  summarise(Total_Amount = sum(`Purchase Amount (USD)`)) %>%
+  ggplot(aes(x = `Date Purchase`, y = Total_Amount)) +
+  geom_line(color = "black") +
+  labs(title = "Total Purchase Amount Over Time",
+       x = "Date", y = "Total Amount (USD)")
+  
+fashion_df %>%
+  group_by(`Payment Method`) %>%
+  summarise(Avg_Purchase = mean(`Purchase Amount (USD)`)) %>%
+  ggplot(aes(x = `Payment Method`, y = Avg_Purchase)) +
+  geom_col(fill = "red") +
+  labs(title = "Average Purchase Amount by Payment Method")
+  
+  
+
+
+fashion_df %>%
+  group_by(`Item Purchased`) %>%
+  summarise(Count = n()) %>%
+  ggplot(aes(x = reorder(`Item Purchased`, -Count), y = Count)) +
+  geom_col(fill = "pink") +
+  labs(title = "Number of Purchases per Item", x = "Item", y = "Count") +
+  theme(axis.text.x = element_text(angle = 45))  
+  
+  
+  
+  
+fashion_df %>%
+  group_by(`Item Purchased`) %>%
+  summarise(Total_Sales = sum(`Purchase Amount (USD)`)) %>%
+  ggplot(aes(x = reorder(`Item Purchased`, -Total_Sales), y = Total_Sales)) +
+  geom_col(fill = "red") +
+  labs(title = "Total Sales per Item", x = "Item", y = "Sales (USD)") +
+  theme(axis.text.x = element_text(angle = 45))
+  
+  
+  
+  
+  
+  

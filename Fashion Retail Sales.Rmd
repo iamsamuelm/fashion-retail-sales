@@ -7,6 +7,8 @@ output: html_document
 
 # Fashion Retail Sales Dataset
 
+# mention that this is simulated 
+
 This data set contains 3,400 records of fashion retail sales, capturing various details about customer purchases, including item details, purchase amounts, ratings, and payment methods. It is useful for analyzing customer buying behavior, product popularity, and payment preferences.
 
 ```{r}
@@ -103,6 +105,7 @@ ggplot(fashion_df, aes(x = `Date Purchase`)) +
 #Bivariate Plots
 ```{r}
 # Plot 1: Review Rating by Payment
+# repetitve with plot 4
 ggplot(fashion_df, aes(x = `Review Rating`, fill = `Payment Method`)) +
   geom_histogram(binwidth = 0.5, position = "dodge", color = "black", na.rm = TRUE) +
   labs(
@@ -116,6 +119,7 @@ ggplot(fashion_df, aes(x = `Review Rating`, fill = `Payment Method`)) +
 
 ```{r}
 # Plot 2: Total Purchase Over Time
+# stretching needed, top
 fashion_df %>%
   group_by(`Date Purchase`) %>%
   summarise(Total_Amount = sum(`Purchase Amount (USD)`)) %>%
@@ -148,6 +152,7 @@ fashion_df %>%
   
 ```{r}
 # Plot 4: Purchase per item
+#spark lines, change date, change the chart
 fashion_df %>%
   group_by(`Item Purchased`) %>%
   summarise(Count = n()) %>%

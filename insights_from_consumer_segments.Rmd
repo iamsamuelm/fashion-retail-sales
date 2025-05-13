@@ -1,0 +1,282 @@
+---
+title: "Understanding Retail Consumer Segments"
+author: "Samuel Muma, Aaliyah Bahru, Shihao Lu, Betanya Woldgiorgis, Akshaya Gajula"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+## Intro
+
+In today’s competitive fashion retail landscape, understanding what drives customer spending and satisfaction is essential for brands seeking to retain and grow their consumer base. This project explores transaction-level retail data to uncover patterns in customer behavior across different demographic and behavioral segments. 
+
+By focusing on total spending (Total_Amount), customer satisfaction (Ratings), and customer types (Customer_Segment), we aim to identify actionable insights that can inform data-driven marketing and sales strategies.Specifically, we ask: **What factors most influence total customer spending, and how do satisfaction levels vary across customer segments in fashion retail?**
+
+**Key Metrics**
+
+* Total_Amount: Total monetary value spent, serves as the primary indicator of spending behavior. 
+* Customer_Segment: Represents various customer types, such as New, Regular, or Premium.
+* Ratings: A numerical measure of customer satisfaction. Higher value indicates more positive feedback. 
+
+**"So What?" Impact:**
+
+* Retailers can prioritize high-value segments.
+* They can identify which customer types are under performing or unhappy.
+* They can refine marketing strategies by focusing on where money and loyalty intersect. 
+
+## Data Pre-Processing
+
+```{r, warning=FALSE}
+# Required packages
+required_packages <- c("readr", "dplyr", "rstatix", "tidyverse", "ggplot2", "colorspace", "scales") 
+
+new_packages <- required_packages[!required_packages %in% installed.packages()]
+if (length(new_packages) > 0) {
+  install.packages(new_packages)
+}
+
+library(readr)
+library(dplyr)
+library(rstatix)
+library(tidyverse)
+library(ggplot2)
+library(scales)
+library(colorspace)
+
+# Loading Dataset
+retail_data <- read_csv("retail_analysis.csv")
+
+# Remove direct identifiers
+retail_data <- retail_data %>%
+  select(-c(Name, Email, Phone, Address, City, State, Zipcode))
+
+# Remove ID columns
+retail_data <- retail_data %>%
+  select(-c(Transaction_ID, Customer_ID))
+
+# Removing unrelated or redundant columns
+cols_to_drop <- c("Date", "Time","Amount", "Income", "Year", "Total_Purchases", "Product_Brand", "Product_Type", "Shipping_Method", "Payment_Method", "Order_Status", "Feedback", "products")
+
+retail_data <- retail_data %>%
+  select(-all_of(cols_to_drop))
+
+head(retail_data)
+colnames(retail_data)
+```
+
+## Data Cleaning
+
+```{r}
+# Creating Regions
+retail_data <- retail_data %>%
+  filter(!is.na(Country)) %>%
+  mutate(Region = case_when(
+    Country %in% c("USA", "Canada") ~ "North America",
+    Country %in% c("Germany", "UK") ~ "Europe",
+    Country == "Australia" ~ "Oceania",
+    TRUE ~ "Other"
+  ))
+
+# Creating Generations
+retail_data <- retail_data %>%
+  mutate(Generation = case_when(
+    Age >= 18 & Age <= 26 ~ "Gen Z",
+    Age >= 27 & Age <= 42 ~ "Millennials",
+    Age >= 43 & Age <= 58 ~ "Gen X",
+    Age >= 59 ~ "Boomers",
+    TRUE ~ NA_character_
+  ))
+
+retail_data <- retail_data %>%
+  mutate(Generation = factor(Generation, levels = c("Gen Z", "Millennials", "Gen X", "Boomers")))
+
+# Creating Quarters
+retail_data <- retail_data %>%
+  mutate(Quarter = case_when(
+    Month %in% c("January", "February", "March") ~ "Q1",
+    Month %in% c("April", "May", "June") ~ "Q2",
+    Month %in% c("July", "August", "September") ~ "Q3",
+    Month %in% c("October", "November", "December") ~ "Q4",
+    TRUE ~ NA_character_
+  ))
+
+# Rounding Total_Amount to whole numbers
+retail_data <- retail_data %>%
+  mutate(Total_Amount = round(Total_Amount))
+
+# Filter Product_Category
+retail_data <- retail_data %>%
+  filter(Product_Category == "Clothing")
+
+# Handing any missing values
+retail_data <- retail_data %>%
+  drop_na()
+
+head(retail_data)
+```
+
+```{r}
+# Setting a default theme
+custom_theme <- function(base_size = 12, base_family = "Helvetica Neue") {
+  theme_minimal(base_size = base_size, base_family = base_family) +
+    theme(
+      plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+      axis.title.x = element_text(size = 12, margin = margin(t = 10)),
+      axis.title.y = element_text(size = 12, margin = margin(r = 10)),
+      axis.text = element_text(size = 11),
+      panel.grid.major.y = element_line(color = "grey90"),
+      panel.grid.major.x = element_blank(),
+      panel.grid.minor = element_blank(),
+      plot.background = element_rect(fill = "white", color = NA),
+      panel.background = element_rect(fill = "white", color = NA),
+      legend.position = "none"
+    )
+}
+
+# Gradient colors
+gradient_colors <- colorspace::sequential_hcl(5, palette = "Blues 3")
+```
+
+## Exploratory Data Analysis
+
+**Who are high-value consumers?**
+Imagine a fashion brand trying to identify its most valuable customers—not just those who spend the most per transaction, but those who show up, engage, and keep coming back. According to the chart on total spending by segment, Regular customers emerge as the backbone of revenue.
+
+While Premium shoppers may spend more per item, it’s the Regulars, the consistent, loyal buyers—who ultimately drive the highest total spend. These are the customers updating wardrobes seasonally, following evolving trends, or returning simply out of habit and brand trust.
+
+In a competitive retail environment, they are the dependable core: not flashy, but essential. This behavior reflects a key truth in fashion retail—value doesn’t just come from luxury, it comes from loyalty.
+
+For marketers and strategists, the takeaway is clear: invest in the experience, retention, and re-engagement of your Regulars. They’re not just shopping—they’re showing up.
+
+```{r, warning=FALSE}
+# 1. Average Spending by Customer Segment
+retail_data %>%
+  group_by(Customer_Segment) %>%
+  summarise(Total_Spending = sum(Total_Amount)) %>%
+  ggplot(aes(x = reorder(Customer_Segment, -Total_Spending), y = Total_Spending, fill = Customer_Segment)) +
+  geom_col(width = 0.6, color = "white") +
+  scale_fill_manual(values = gradient_colors) +
+  scale_y_continuous(labels = comma_format()) +
+  labs(
+    title = "Total Spending by Customer Segment",
+    x = NULL,
+    y = "Total Spend (USD)"
+  ) +
+  custom_theme()
+```
+
+**Which generation is the happiest with their experience?**
+When it comes to satisfaction, one generation stands out. The chart reveals that Generation X reports the highest average satisfaction with their fashion retail experience.
+
+This isn't just a data point, it’s a signal. Gen X, often seen as the bridge between analog and digital consumers, appears to feel seen, served, and satisfied. Whether it's the quality of the products, the ease of the shopping experience, or the relevance of the styles, something in the current offering is landing exceptionally well with this group.
+
+In a space where many brands chase Gen Z trends or Millennial’ social buzz, this finding is a reminder: the most quietly powerful customers may already be happy—now it's about keeping them that way.
+
+For retail teams, this insight speaks to opportunity and responsibility. Gen X may not shout their loyalty, but when their needs are met, they stick around. Enhancing what already works for them—without disruption—could turn satisfaction into long-term brand advocacy.
+
+```{r, warning=FALSE}
+#2. Average Satisfaction by Generation
+retail_data %>%
+  group_by(Generation) %>%
+  summarise(Average_Rating = mean(Ratings)) %>%
+  ggplot(aes(x = Generation, y = Average_Rating, fill = Generation)) +
+  geom_col(width = 0.6, color = "white") +
+  scale_fill_manual(values = gradient_colors) +
+  labs(
+    title = "Average Satisfaction by Generation",
+    x = NULL,
+    y = "Avg Rating (1–5)"
+  ) +
+  custom_theme()
+```
+
+**Do higher spenders report better satisfaction?**
+At first glance, it might seem intuitive that the more a customer spends, the more satisfied they must be. But the scatter plot tells a different story: there’s no strong relationship between total spending and satisfaction.
+
+High spenders aren’t consistently happier, and lower spenders aren’t necessarily less satisfied. The distribution of points is scattered across all rating levels, suggesting that satisfaction in fashion retail is influenced by more than just the price tag.
+
+This disconnect points to a deeper truth in consumer behavior—experience matters more than the transaction. Product quality, fit, brand alignment, and customer service likely shape a customer’s happiness far more than the total amount on the receipt.
+
+For retailers, this is a cue to invest beyond discounts or upsells. A polished experience, a smooth return process, or even thoughtful packaging could mean more to a customer than how much they spent. In short: loyalty lives in the details, not just the dollars.
+
+```{r, warning=FALSE}
+# 3. Spending vs. Satisfaction
+ggplot(retail_data, aes(x = Total_Amount, y = Ratings)) +
+  geom_jitter(width = 10, alpha = 0.15, color = gradient_colors[4], size = 1) +
+  labs(
+    title = "Spending vs. Satisfaction",
+    x = "Total Spend (USD)",
+    y = "Rating (1–5)"
+  ) +
+  custom_theme()
+```
+
+**When are people spending the most?**
+The bar chart on total spending by quarter reveals a clear peak in Q3, signaling a meaningful seasonal trend in consumer behavior.
+
+This isn't just a statistical bump, it's a rhythm in the retail cycle. Quarter 3, spanning July through September, aligns with key moments in the fashion calendar: the launch of fall collections, back-to-school shopping, and end-of-season promotions. These triggers create a natural momentum that encourages spending, even before the holiday rush of Q4 begins.
+
+For fashion retailers, this insight is more than just timing—it’s leverage. Understanding that Q3 consistently drives the highest transaction volume means marketing teams can time campaigns with precision, while inventory teams can align stock with demand before it spikes.
+
+It’s a reminder that in retail, seasonality is strategy—and brands that prepare for Q3 don’t just respond to demand, they lead it.
+
+
+```{r, warning=FALSE}
+# 4. Total Spending by Quarter
+retail_data %>%
+  group_by(Quarter) %>%
+  summarise(Total_Spending = sum(Total_Amount)) %>%
+  ggplot(aes(x = Quarter, y = Total_Spending, fill = Quarter)) +
+  geom_col(width = 0.6, color = "white") +
+  scale_fill_manual(values = gradient_colors) +
+  scale_y_continuous(labels = comma_format()) +
+  labs(
+    title = "Total Spending by Quarter",
+    x = NULL,
+    y = "Total Spend (USD)"
+  ) +
+  custom_theme()
+```
+
+**Does customer satisfaction differ by region?**
+The chart on average customer satisfaction by region shows a relatively consistent experience across Europe and North America—but Oceania quietly leads the way with slightly higher satisfaction scores.
+
+While the difference isn’t dramatic, it’s meaningful. It signals that customers in Oceania may be experiencing something—whether in service, product fit, or cultural alignment—that’s resonating more deeply. Even small shifts in perception can reveal valuable differences in how brand experiences land across regions.
+
+For a fashion retailer, this opens up two paths:
+One, to study what’s working well in Oceania, and two, to close the gap in Europe and North America. Are expectations different? Are operations smoother? Is there something in tone, timing, or service that better aligns with those customers?
+
+This insight is a prompt, not a conclusion—a signal to localize without losing consistency. Because when customer sentiment shifts by region, so should strategy.
+
+
+```{r, warning=FALSE}
+# 5. Average Satisfaction by Region
+retail_data %>%
+  group_by(Region) %>%
+  summarise(Average_Rating = mean(Ratings)) %>%
+  ggplot(aes(x = Region, y = Average_Rating, fill = Region)) +
+  geom_col(width = 0.6, color = "white") +
+  scale_fill_manual(values = gradient_colors) +
+  labs(
+    title = "Average Satisfaction by Region",
+    x = NULL,
+    y = "Avg Rating (1–5)"
+  ) +
+  custom_theme()
+```
+
+## Insight Summary
+
+This analysis of customer behavior within the fashion retail space uncovers several key trends that can inform more targeted, data-driven strategies:
+
+* Regular customers drive the highest total spending, outperforming even Premium segments. Their consistency and engagement highlight the importance of nurturing loyal, return shoppers over chasing one-time high spenders.
+* Generation X reports the highest levels of satisfaction, suggesting a strong alignment between their expectations and the brand’s current offerings. This group may not be the loudest, but their loyalty makes them a valuable foundation for long-term retention strategies.
+* There is no strong correlation between how much customers spend and how satisfied they are. This finding emphasizes that satisfaction is shaped more by the quality of the experience than the size of the transaction, reinforcing the need to invest in service, fit, and overall brand experience.
+* Spending peaks in Quarter 3, likely tied to seasonal events such as back-to-school shopping, fall fashion drops, and end-of-summer promotions. This trend provides a strategic window for campaign timing, inventory prep, and promotional targeting.
+* Oceania shows slightly higher customer satisfaction than Europe and North America. While subtle, this variance suggests that localized experiences, cultural alignment, or regional service quality may play a role in shaping customer perception.
+
+Customer loyalty, seasonal alignment, and a commitment to quality experience are more predictive of success than brand, product type, or raw spend. Retailers that invest in the behaviors and sentiments behind the data—especially among Regular customers and satisfied generational cohorts—will be best positioned to scale both revenue and reputation.
+
+
+## Source
+Prajapati, S. (n.d.). Retail analysis: Large dataset. Kaggle. Retrieved May 13, 2025, from https://www.kaggle.com/datasets/sahilprajapati143/retail-analysis-large-dataset
+

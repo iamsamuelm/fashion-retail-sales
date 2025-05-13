@@ -25,23 +25,27 @@ library(scales)
 ### Load and Preview
 
 ```{r}
-data1 <- read.csv("new_retail_data.csv") 
-data1 <- head(data1, 500)
-head(data1)
+raw_data <- read.csv("new_retail_data.csv") 
+raw_data <- head(raw_data, 500)
+head(raw_data)
 ```
 
 ### Cleaning
 
 ```{r}
-data1 <- subset(data1, 
-                !is.na(Ratings) & Ratings != "" &
-                !is.na(Product_Category) & Product_Category != "" &
-                !is.na(Gender) & Gender != "" &
-                !is.na(Total_Amount) & Total_Amount != "" &
-                !is.na(Customer_Segment) & Customer_Segment != "" &
-                !is.na(Total_Purchases) & Total_Purchases != "" &
-                !is.na(Age) & Age != "" &
-                !is.na(Year) & Year != "")
+cleaned_data <-  raw_data %>%
+  filter(!is.na(Ratings) & Ratings != "" &
+           !is.na(Product_Category) & Product_Category != "" &
+           !is.na(Gender) & Gender != "" &
+           !is.na(Total_Amount) & Total_Amount != "" &
+           !is.na(Customer_Segment) & Customer_Segment != "" &
+           !is.na(Total_Purchases) & Total_Purchases != "" &
+           !is.na(Age) & Age != "" &
+           !is.na(Year) & Year != "")
+
+# write.csv(cleaned_data, "cleaned_retail_data.csv", row.names = FALSE)
+
+data1 <- read.csv("cleaned_retail_data.csv")
 
 ```
 
@@ -66,6 +70,7 @@ data1 %>%
   labs(title = "Total Spending by Age Group", y = "Total Amount (USD)", x = "Age Group") +
   scale_y_continuous(labels = comma) +
   theme_minimal()
+
 ```
 
 **Product Preferences by Age Group**

@@ -5,15 +5,11 @@ date: "`r Sys.Date()`"
 output: html_document
 ---
 
-## Introduction
+## Our Story
 
 In today’s competitive fashion retail landscape, understanding what drives customer spending and satisfaction is essential for brands seeking to retain and grow their consumer base. This project explores transaction-level retail data to uncover patterns in customer behavior across different demographic and behavioral segments. 
 
 By focusing on total spending (Total_Amount), customer satisfaction (Ratings), and customer types (Customer_Segment), we aim to identify actionable insights that can inform data-driven marketing and sales strategies.Specifically, we ask: **What factors most influence total customer spending, and how do satisfaction levels vary across customer segments in fashion retail?**
-
-### Our story:
-Fashion and retail businesses frequently face challenges in identifying the key factors that influence consumer spending behavior. In an increasingly competitive and diverse marketplace, understanding the dynamics behind purchasing decisions is critical for improving customer engagement and driving sales. This project aims to explore the relationship between customer demographics—such as age, income level, and socioeconomic status—and spending patterns within the fashion retail industry.
-
 
 **Key Metrics**
 

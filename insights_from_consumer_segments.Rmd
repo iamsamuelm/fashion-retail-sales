@@ -11,10 +11,12 @@ In today’s competitive fashion retail landscape, understanding what drives cus
 
 By focusing on total spending (Total_Amount), customer satisfaction (Ratings), and customer types (Customer_Segment), we aim to identify actionable insights that can inform data-driven marketing and sales strategies.Specifically, we ask: **What factors most influence total customer spending, and how do satisfaction levels vary across customer segments in fashion retail?**
 
-Our story:
-Fashion and retail businesses frequently face challenges in identifying the key factors that influence consumer spending behavior. In an increasingly competitive and diverse marketplace, understanding the dynamics behind purchasing decisions is critical for improving customer engagement and driving sales. This project aims to explore the relationship between customer demographics—such as age, income level, and socioeconomic status—and spending patterns within the fashion retail industry.
-By analyzing transaction-level data, we will examine metrics such as the average amount spent per transaction, per customer, and the volume of items purchased during each shopping visit. These indicators provide valuable insights into consumer behavior across different demographic segments. For instance, younger customers may prioritize trendiness and make more frequent, lower-cost purchases, while older or higher-income customers may spend more per transaction but shop less often.
-Our goal is to generate actionable insights that can help fashion retailers tailor their marketing strategies, product assortments, and customer service approaches to better meet the needs and preferences of their diverse customer base. Ultimately, this research seeks to inform data-driven decision-making in the fashion retail sector by revealing how demographic factors shape consumer purchasing trends.
+## Our story:
+Fashion and retail businesses frequently face challenges in identifying the key factors that influence consumer spending behavior. In an increasingly competitive and diverse marketplace, understanding the dynamics behind purchasing decisions is critical for improving customer engagement and driving sales. This project aims to explore the relationship between customer demographics—such as age, income level, and socioeconomic status—and spending patterns within the fashion retail industry. **
+
+By analyzing transaction-level data, we will examine metrics such as the average amount spent per transaction, per customer, and the volume of items purchased during each shopping visit. These indicators provide valuable insights into consumer behavior across different demographic segments. For instance, younger customers may prioritize trendiness and make more frequent, lower-cost purchases, while older or higher-income customers may spend more per transaction but shop less often. **
+
+Our goal is to generate actionable insights that can help fashion retailers tailor their marketing strategies, product assortments, and customer service approaches to better meet the needs and preferences of their diverse customer base. Ultimately, this research seeks to inform data-driven decision-making in the fashion retail sector by revealing how demographic factors shape consumer purchasing trends.**
 
 
 **Key Metrics**
